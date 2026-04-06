@@ -45,31 +45,52 @@ public class Board {
      * player reference.
      */
     public void displayBoard() {
+		System.out.println("\n  --- CONNECT FOUR ---");
+		
 		// Print top boundary
 		System.out.print("  ");
-		for (int j = 0; j < columns; j++) System.out.print("--- ");
+		for (int j = 0; j < columns; j++) {
+			System.out.print("--- ");
+		}
 		System.out.println();
 
+		// Print the Rows
 		for (int i = 0; i < rows; i++) {
 			System.out.print("  "); // Left padding
 			for (int j = 0; j < columns; j++) {
-				System.out.print("| " + grid[i][j] + " ");
+				
+				// --- INTEGRATED COLOR LOGIC ---
+				char piece = grid[i][j];
+				String coloredPiece;
+				
+				if (piece == 'R') {
+					coloredPiece = GameSettings.RED + piece + GameSettings.RESET;
+				} else if (piece == 'Y') {
+					coloredPiece = GameSettings.YELLOW + piece + GameSettings.RESET;
+				} else {
+					coloredPiece = String.valueOf(piece);
+				}
+								
+				System.out.print("| " + coloredPiece + " ");
 			}
 			System.out.println("|");
 		}
 
 		// Print bottom boundary
 		System.out.print("  ");
-		for (int j = 0; j < columns; j++) System.out.print("--- ");
+		for (int j = 0; j < columns; j++) {
+			System.out.print("--- ");
+		}
 		System.out.println();
 
-		// Print column numbers with matching alignment
-		System.out.print("    "); // Initial offset
+		// Print column numbers
+		System.out.print("    "); // Spacing to align numbers under columns
 		for (int j = 0; j < columns; j++) {
 			System.out.print(j + "   ");
 		}
 		System.out.println("\n");
 	}
+	
 	
 	/**
      * Attempts to place a piece in the specified column.
@@ -144,6 +165,17 @@ public class Board {
 	}
 	
 	/**
+	 * Checks if the board is completely full (a Draw).
+	 * @return boolean True if no EMPTY slots remain.
+	 */
+	public boolean isFull() {
+		for (int j = 0; j < columns; j++) {
+			if (grid[0][j] == '.') return false; // If any top row cell is empty, board isn't full
+		}
+		return true;
+	}
+	
+	/**
 	 * Undoes a move by removing the top-most piece in the given column.
 	 * @param col The column to remove a piece from.
 	 */
@@ -155,6 +187,21 @@ public class Board {
 			}
 		}
 	}
+	
+	/**
+	 * Undoes a move by removing the top-most piece in the given column.
+	 * @param col The column to remove a piece from.
+	 */
+	public void redoMove(int col) {
+		for (int i = 0; i < rows; i++) {
+			if (grid[i][col] != '.') {
+				grid[i][col] = '.'; // Remove the piece
+				return;
+			}
+		}
+	}
+	
+	
 	
 	
 }
