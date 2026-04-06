@@ -1,4 +1,5 @@
-import java.util.*;
+import java.util.Scanner;
+import java.util.Stack;
 
 /**
  * Main controller class for the Connect Four game.
@@ -6,6 +7,10 @@ import java.util.*;
  */
 public class ConnectFour {
 	private static Scanner scanner = new Scanner(System.in);
+	
+	// This stack will store the history of columns played
+    private static Stack<Integer> moveHistory = new Stack<>();
+	
 	
     public static void main(String[] args) {
 		printWelcomeMessage();
@@ -81,11 +86,29 @@ public class ConnectFour {
 		while (!isGameOver) {
 			board.displayBoard();
 			System.out.println("Player " + currentPlayer + "'s turn.");
-			System.out.print("Enter column (0-6): ");
+			System.out.print("Enter column (0-6) or -1 to UNDO: ");
         
 			int col = scanner.nextInt();
 			
+			//Check if the UNDO command has been selected
+			if (col == -1) {
+				if (!moveHistory.isEmpty()) {
+					int lastCol = moveHistory.pop();
+					board.undoMove(lastCol);
+					// Switch back to the previous player
+					currentPlayer = (currentPlayer == 'R') ? 'Y' : 'R';
+					System.out.println("Undo successful!");
+				} else {
+					System.out.println("Nothing to undo!");
+				}
+				continue; // Refresh the loop
+			}
+			
+			//Handle a normal move
 			if (board.placePiece(col, currentPlayer)) {
+				//save a move
+				moveHistory.push(col);
+				
 				// Check if this move won the game
 				if (board.checkWin(currentPlayer)) {
 					board.displayBoard();

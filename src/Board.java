@@ -45,19 +45,31 @@ public class Board {
      * player reference.
      */
     public void displayBoard() {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                System.out.print("|" + grid[i][j]);
-            }
-            System.out.println("|");
-        }
-        
-        // Print column numbers at the bottom for easy reference
-        for (int j = 0; j < columns; j++) {
-            System.out.print(" " + j);
-        }
-        System.out.println("\n");
-    }
+		// Print top boundary
+		System.out.print("  ");
+		for (int j = 0; j < columns; j++) System.out.print("--- ");
+		System.out.println();
+
+		for (int i = 0; i < rows; i++) {
+			System.out.print("  "); // Left padding
+			for (int j = 0; j < columns; j++) {
+				System.out.print("| " + grid[i][j] + " ");
+			}
+			System.out.println("|");
+		}
+
+		// Print bottom boundary
+		System.out.print("  ");
+		for (int j = 0; j < columns; j++) System.out.print("--- ");
+		System.out.println();
+
+		// Print column numbers with matching alignment
+		System.out.print("    "); // Initial offset
+		for (int j = 0; j < columns; j++) {
+			System.out.print(j + "   ");
+		}
+		System.out.println("\n");
+	}
 	
 	/**
      * Attempts to place a piece in the specified column.
@@ -129,7 +141,20 @@ public class Board {
     }
 
     return false;
-}
+	}
+	
+	/**
+	 * Undoes a move by removing the top-most piece in the given column.
+	 * @param col The column to remove a piece from.
+	 */
+	public void undoMove(int col) {
+		for (int i = 0; i < rows; i++) {
+			if (grid[i][col] != '.') {
+				grid[i][col] = '.'; // Remove the piece
+				return;
+			}
+		}
+	}
 	
 	
 }
