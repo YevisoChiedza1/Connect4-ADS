@@ -69,13 +69,13 @@ public class Board {
      * @return boolean True if piece was placed, false if column is full/invalid.
      */
     public boolean placePiece(int col, char symbol) {
-        // 1. Validation: Is the column within bounds?
+        // Check if the column within bounds?
         if (col < 0 || col >= columns) {
             System.out.println("Invalid column! Choose between 0 and " + (columns - 1));
             return false;
         }
 
-        // 2. Gravity Logic: Start from the bottom row and move up
+        // Implement gravity logic, start from the bottom row and move up
         for (int i = rows - 1; i >= 0; i--) {
             if (grid[i][col] == EMPTY) {
                 grid[i][col] = symbol;
@@ -83,7 +83,7 @@ public class Board {
             }
         }
 
-        // 3. Validation: If the loop finishes, the column is full
+        //If the loop finishes, the column is full
         System.out.println("Column " + col + " is full!");
         return false;
     }

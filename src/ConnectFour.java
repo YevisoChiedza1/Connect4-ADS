@@ -50,4 +50,35 @@ public class ConnectFour {
         
         return scanner.nextInt();
     }
+	
+	/**
+	* Main game loop implementation.
+	* Manages turn-taking and interaction between players.
+	*/
+	public static void startGame(Board board) {
+		boolean isGameOver = false;
+		char currentPlayer = 'R'; // 'R' for Red, 'Y' for Yellow
+    
+		while (!isGameOver) {
+			board.displayBoard();
+			System.out.println("Player " + currentPlayer + "'s turn.");
+			System.out.print("Enter column (0-6): ");
+        
+			int col = scanner.nextInt();
+        
+			// Try to place the piece
+			if (board.placePiece(col, currentPlayer)) {
+            // Success! In the next step, we will add: 
+            // isGameOver = board.checkWin(currentPlayer);
+            
+				//switch players
+				currentPlayer = (currentPlayer == 'R') ? 'Y' : 'R';
+			} else {
+				// If placePiece returns false, the column was full or invalid
+				System.out.println("Try again.");
+			}
+		}
+	}
+	
+	
 }
