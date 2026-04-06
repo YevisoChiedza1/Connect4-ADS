@@ -58,4 +58,33 @@ public class Board {
         }
         System.out.println("\n");
     }
+	
+	/**
+     * Attempts to place a piece in the specified column.
+     * Implements Gravity by finding the lowest available row.
+     * * Time Complexity: O(R) where R is the number of rows.
+     * Space Complexity: O(1) as no additional structures are created.
+     * * @param col The column index (0 to columns-1) chosen by the player.
+     * @param symbol The player's symbol ('R' or 'Y').
+     * @return boolean True if piece was placed, false if column is full/invalid.
+     */
+    public boolean placePiece(int col, char symbol) {
+        // 1. Validation: Is the column within bounds?
+        if (col < 0 || col >= columns) {
+            System.out.println("Invalid column! Choose between 0 and " + (columns - 1));
+            return false;
+        }
+
+        // 2. Gravity Logic: Start from the bottom row and move up
+        for (int i = rows - 1; i >= 0; i--) {
+            if (grid[i][col] == EMPTY) {
+                grid[i][col] = symbol;
+                return true; // Success!
+            }
+        }
+
+        // 3. Validation: If the loop finishes, the column is full
+        System.out.println("Column " + col + " is full!");
+        return false;
+    }
 }
