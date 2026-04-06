@@ -8,16 +8,35 @@ public class ConnectFour {
 	private static Scanner scanner = new Scanner(System.in);
 	
     public static void main(String[] args) {
-		
-        printWelcomeMessage();
+		printWelcomeMessage();
 		int choice = showMenu();
 		
-		//Initialize the game board
-		Board board = new Board(6,7);
-		board.displayBoard();
+		//Confirm the game mode selection
+		String modeName = "";
+		switch(choice) {
+			case 1: modeName = "Player vs Player"; break;
+			case 2: modeName = "Player vs CPU (Easy)"; break;
+			case 3: modeName = "Player vs CPU (Medium)"; break;
+			case 4: modeName = "Player vs CPU (Hard)"; break;
+			default: modeName = "Custom Mode"; break;
+		}
 		
-		System.out.println("Game Mode " + choice + " selected. Ready to play!");
-    }
+		System.out.println("\n>>> " + modeName + " selected. Starting game now...");
+		
+		// Implement a 3 second countdown
+		try {
+			for (int i = 3; i > 0; i--) {
+				System.out.print("Starting in " + i + "...\n");
+				Thread.sleep(1000); // Wait for 1 second (1000 milliseconds)
+			}
+			System.out.println("GO!\n");
+		} catch (InterruptedException e) {
+			System.err.println("Countdown interrupted.");
+		}
+
+		Board gameBoard = new Board(6, 7);
+		startGame(gameBoard);
+	}
 
 	/**
      * Displays an ASCII welcome message
@@ -65,17 +84,17 @@ public class ConnectFour {
 			System.out.print("Enter column (0-6): ");
         
 			int col = scanner.nextInt();
-        
-			// Try to place the piece
+			
 			if (board.placePiece(col, currentPlayer)) {
-            // Success! In the next step, we will add: 
-            // isGameOver = board.checkWin(currentPlayer);
-            
-				//switch players
-				currentPlayer = (currentPlayer == 'R') ? 'Y' : 'R';
-			} else {
-				// If placePiece returns false, the column was full or invalid
-				System.out.println("Try again.");
+				// Check if this move won the game
+				if (board.checkWin(currentPlayer)) {
+					board.displayBoard();
+					System.out.println("Congratulations! Player " + currentPlayer + " wins!");
+					isGameOver = true;
+				} else {
+					// Switch players if no win
+					currentPlayer = (currentPlayer == 'R') ? 'Y' : 'R';
+				}
 			}
 		}
 	}
