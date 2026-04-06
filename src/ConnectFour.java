@@ -1,6 +1,7 @@
 import java.util.Scanner;
 import java.util.Stack;
 
+
 /**
  * Main controller class for the Connect Four game.
  * Handles the game loop, user input, and menu navigation.
@@ -10,6 +11,9 @@ public class ConnectFour {
 	
 	// This stack will store the history of columns played
     private static Stack<Integer> moveHistory = new Stack<>();
+	
+	// History of moves undone (to allow Redo)
+	private static Stack<Integer> redoStack = new Stack<>();
 	
 	
     public static void main(String[] args) {
@@ -81,43 +85,73 @@ public class ConnectFour {
 	*/
 	public static void startGame(Board board) {
 		boolean isGameOver = false;
-		char currentPlayer = 'R'; // 'R' for Red, 'Y' for Yellow
-    
+		char currentPlayer = 'R'; 
+
 		while (!isGameOver) {
 			board.displayBoard();
-			System.out.println("Player " + currentPlayer + "'s turn.");
-			System.out.print("Enter column (0-6) or -1 to UNDO: ");
-        
-			int col = scanner.nextInt();
 			
-			//Check if the UNDO command has been selected
-			if (col == -1) {
+			// Display the action bar of the game
+			System.out.println(GameSettings.CYAN + " [U] Undo ↺ " + GameSettings.RESET + " | " + 
+							   GameSettings.YELLOW + " [R] Redo ↻ " + GameSettings.RESET + " | " + 
+							   " [0-6] Drop Piece");
+			
+			// Implmenet Color-coded Player Prompt
+			String color = (currentPlayer == 'R') ? GameSettings.RED : GameSettings.YELLOW;
+			System.out.print("Player " + color + currentPlayer + GameSettings.RESET + " > ");
+			
+			String input = scanner.next().toUpperCase();
+
+			// Handle the UNDO command
+			if (input.equals("U")) {
 				if (!moveHistory.isEmpty()) {
 					int lastCol = moveHistory.pop();
+					redoStack.push(lastCol);
 					board.undoMove(lastCol);
-					// Switch back to the previous player
 					currentPlayer = (currentPlayer == 'R') ? 'Y' : 'R';
-					System.out.println("Undo successful!");
+					System.out.println(GameSettings.GREEN + ">>> Undo successful." + GameSettings.RESET);
 				} else {
-					System.out.println("Nothing to undo!");
+					System.out.println(GameSettings.RED + ">>> Nothing to undo!" + GameSettings.RESET);
 				}
-				continue; // Refresh the loop
+				continue;
 			}
-			
-			//Handle a normal move
-			if (board.placePiece(col, currentPlayer)) {
-				//save a move
-				moveHistory.push(col);
-				
-				// Check if this move won the game
-				if (board.checkWin(currentPlayer)) {
-					board.displayBoard();
-					System.out.println("Congratulations! Player " + currentPlayer + " wins!");
-					isGameOver = true;
-				} else {
-					// Switch players if no win
+
+			// 4. Handle the REDO command
+			if (input.equals("R")) {
+				if (!redoStack.isEmpty()) {
+					int redoCol = redoStack.pop();
+					board.placePiece(redoCol, currentPlayer);
+					moveHistory.push(redoCol);
 					currentPlayer = (currentPlayer == 'R') ? 'Y' : 'R';
+					System.out.println(GameSettings.GREEN + ">>> Redo successful." + GameSettings.RESET);
+				} else {
+					System.out.println(GameSettings.RED + ">>> Nothing to redo!" + GameSettings.RESET);
 				}
+				continue;
+			}
+
+			// Handle Column Placement
+			try {
+				int col = Integer.parseInt(input);
+				if (board.placePiece(col, currentPlayer)) {
+					moveHistory.push(col);
+					redoStack.clear(); // Clear redo history on a new move
+					
+					if (board.checkWin(currentPlayer)) {
+						board.displayBoard();
+						System.out.println(GameSettings.GREEN + "★ CONGRATULATIONS! Player " + currentPlayer + " WINS! ★" + GameSettings.RESET);
+						isGameOver = true;
+					} else if (board.isFull()) {
+						board.displayBoard();
+						System.out.println(GameSettings.YELLOW + "DRAW! The board is full." + GameSettings.RESET);
+						isGameOver = true;
+					} else {
+						currentPlayer = (currentPlayer == 'R') ? 'Y' : 'R';
+					}
+				} else {
+					System.out.println(GameSettings.RED + ">>> Column full or invalid!" + GameSettings.RESET);
+				}
+			} catch (NumberFormatException e) {
+				System.out.println(GameSettings.RED + ">>> Error: Enter 0-6, U, or R." + GameSettings.RESET);
 			}
 		}
 	}
